@@ -11,7 +11,7 @@ func main() {
 	//name := flag.String("name", "Александр", "имя для преветствия")
 	//flag.Parse()
 
-	http.HandleFunc("/api/microblog/profiles/1/publications", server.GetPublications)
+	http.HandleFunc("/api/microblog/profiles/1/publications", server.PublicationsHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
