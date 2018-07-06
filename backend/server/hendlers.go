@@ -9,23 +9,6 @@ import (
 	"github.com/ComputePractice2018/microblog/backend/data"
 )
 
-//PublicationsHandler обрабатывает все запросы к /api/microblog/profiles/1/publications/1/comments
-func PublicationsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		GetPublications(w, r)
-		return
-	}
-
-	if r.Method == "POST" {
-		AddPublication(w, r)
-		return
-	}
-
-	massege := fmt.Sprintf("Method %s is not allowed", r.Method)
-	http.Error(w, massege, http.StatusMethodNotAllowed)
-	log.Printf(massege)
-}
-
 //GetPublications обрабатывает запросы на получения списка контактов
 func GetPublications(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Request method: %s", r.Method)
@@ -60,4 +43,12 @@ func AddPublication(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("%+v", publication)
 	w.WriteHeader(http.StatusCreated)
+}
+
+func EditPublication(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func DeletePublication(w http.ResponseWriter, r *http.Request) {
+
 }
