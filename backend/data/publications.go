@@ -1,5 +1,7 @@
 package data
 
+import "fmt"
+
 //Publication структура для хранения публикации
 type Publication struct {
 	Namepub    string `json:"namepub"`
@@ -7,8 +9,35 @@ type Publication struct {
 	Publcation string `json:"publication"`
 }
 
-//PublicationList хранимый список публикаций
-var PublicationList = []Publication{Publication{
-	Namepub:    "Название",
-	Time:       "Время",
-	Publcation: "Публикация"}}
+//publications хранимый список публикаций
+var publications []Publication
+
+//GetPublications возвращает список публикаций
+func GetPublications() []Publication {
+	return publications
+}
+
+//AddPublication добавляет публикацию в конец списка и возвращает id
+func AddPublication(publication Publication) int {
+	id := len(publications)
+	publications = append(publications, publication)
+	return id
+}
+
+//EditPublication изменяет публикацию с id на publication
+func EditPublication(publication Publication, id int) error {
+	if id < 0 || id >= len(publications) {
+		return fmt.Errorf("icorrect ID")
+	}
+	publications[id] = publication
+	return nil
+}
+
+//RemovePublication удаляет публикацию по id
+func RemovePublication(id int) error {
+	if id < 0 || id >= len(publications) {
+		return fmt.Errorf("icorrect ID")
+	}
+	publications = append(publications[:id], publications[id+1:]...)
+	return nil
+}
