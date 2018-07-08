@@ -13,9 +13,17 @@ func main() {
 	//flag.Parse()
 
 	router := mux.NewRouter()
-	router.HandleFunc("/api/microblog/profiles/1/publications", server.GetPublications).Methods("GET")
-	router.HandleFunc("/api/microblog/profiles/1/publications", server.AddPublication).Methods("POST")
-	router.HandleFunc("/api/microblog/profiles/1/publications/{id}", server.EditPublication).Methods("PUT")
-	router.HandleFunc("/api/microblog/profiles/1/publications/{id}", server.DeletePublication).Methods("DELETE")
+	router.HandleFunc("/api/microblog/profiles", server.AddProfile).Methods("POST")
+	router.HandleFunc("/api/microblog/profiles/{id}", server.EditProfile).Methods("PUT")
+
+	router.HandleFunc("/api/microblog/profiles/{id}/publications", server.GetPublications).Methods("GET")
+	router.HandleFunc("/api/microblog/profiles/{id}/publications", server.AddPublication).Methods("POST")
+	router.HandleFunc("/api/microblog/profiles/{id}/publications/{idpub}", server.EditPublication).Methods("PUT")
+	router.HandleFunc("/api/microblog/profiles/{id}/publications/{idpub}", server.DeletePublication).Methods("DELETE")
+
+	router.HandleFunc("/api/microblog/profiles/{id}/publications/{idpub}/comments", server.GetComments).Methods("GET")
+	router.HandleFunc("/api/microblog/profiles/{id}/publications/{idpub}/comments", server.AddComment).Methods("POST")
+	router.HandleFunc("/api/microblog/profiles/{id}/publications/{idpub}/comments/{idcom}", server.EditComment).Methods("PUT")
+	router.HandleFunc("/api/microblog/profiles/{id}/publications/{idpub}/comments/{idcom}", server.DeleteComment).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
