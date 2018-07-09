@@ -11,50 +11,93 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//AddProfile обрабатывает POST запрос
-func AddProfile(w http.ResponseWriter, r *http.Request) {
-	var profile data.Profile
-	err := json.NewDecoder(r.Body).Decode(&profile)
-	if err != nil {
-		massege := fmt.Sprintf("Unable to decode POST data: %v", err)
-		http.Error(w, massege, http.StatusUnsupportedMediaType)
-		log.Printf(massege)
-		return
+//GetProfiles обрабатывает запросы на получения списка профилей
+func GetProfiles(cl data.EditableProfile) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		err := json.NewEncoder(w).Encode(cl.GetProfiles())
+		if err != nil {
+			massege := fmt.Sprintf("Unable to encode data: %v", err)
+			http.Error(w, massege, http.StatusInternalServerError)
+			log.Printf(massege)
+			return
+		}
 	}
-	id := data.AddProfile(profile)
-	w.Header().Add("Location", r.URL.String()+"/"+strconv.Itoa(id))
-	w.WriteHeader(http.StatusCreated)
+}
+
+//AddProfile обрабатывает POST запрос
+func AddProfile(cl data.EditableProfile) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var profile data.Profile
+		err := json.NewDecoder(r.Body).Decode(&profile)
+		if err != nil {
+			massege := fmt.Sprintf("Unable to decode POST data: %v", err)
+			http.Error(w, massege, http.StatusUnsupportedMediaType)
+			log.Printf(massege)
+			return
+		}
+		id := cl.AddProfile(profile)
+		w.Header().Add("Location", r.URL.String()+"/"+strconv.Itoa(id))
+		w.WriteHeader(http.StatusCreated)
+	}
 }
 
 //EditProfile обрабатыает PUT запрос
-func EditProfile(w http.ResponseWriter, r *http.Request) {
-	var profile data.Profile
-	err := json.NewDecoder(r.Body).Decode(&profile)
-	if err != nil {
-		massege := fmt.Sprintf("Unable to decode PUT data: %v", err)
-		http.Error(w, massege, http.StatusUnsupportedMediaType)
-		log.Printf(massege)
-		return
-	}
+func EditProfile(cl data.EditableProfile) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var profile data.Profile
+		err := json.NewDecoder(r.Body).Decode(&profile)
+		if err != nil {
+			massege := fmt.Sprintf("Unable to decode PUT data: %v", err)
+			http.Error(w, massege, http.StatusUnsupportedMediaType)
+			log.Printf(massege)
+			return
+		}
 
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
-	}
+		vars := mux.Vars(r)
+		id, err := strconv.Atoi(vars["id"])
+		if err != nil {
+			massege := fmt.Sprintf("Incorrect ID: %v", err)
+			http.Error(w, massege, http.StatusBadRequest)
+			log.Printf(massege)
+			return
+		}
 
-	err = data.EditProfile(profile, id)
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
+		err = cl.EditProfile(id, profile)
+		if err != nil {
+			massege := fmt.Sprintf("Incorrect ID: %v", err)
+			http.Error(w, massege, http.StatusBadRequest)
+			log.Printf(massege)
+			return
+		}
+		w.Header().Add("Location", r.URL.String())
+		w.WriteHeader(http.StatusAccepted)
 	}
-	w.Header().Add("Location", r.URL.String())
-	w.WriteHeader(http.StatusAccepted)
+}
+
+//DeleteProfiles обрабатывает DELETE запрос
+func DeleteProfiles(cl data.EditableProfile) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		id, err := strconv.Atoi(vars["id"])
+		if err != nil {
+			massege := fmt.Sprintf("Incorrect ID: %v", err)
+			http.Error(w, massege, http.StatusBadRequest)
+			log.Printf(massege)
+			return
+		}
+
+		err = cl.RemoveProfile(id)
+		if err != nil {
+			massege := fmt.Sprintf("Incorrect ID: %v", err)
+			http.Error(w, massege, http.StatusBadRequest)
+			log.Printf(massege)
+			return
+		}
+		w.Header().Add("Location", r.URL.String())
+		w.WriteHeader(http.StatusNoContent)
+	}
 }
 
 //GetPublications обрабатывает запросы на получения списка публикаций
@@ -84,16 +127,7 @@ func AddPublication(cl data.EditablePub) func(w http.ResponseWriter, r *http.Req
 			return
 		}
 
-		vars := mux.Vars(r)
-		id, err := strconv.Atoi(vars["id"])
-		if err != nil {
-			massege := fmt.Sprintf("Incorrect ID: %v", err)
-			http.Error(w, massege, http.StatusBadRequest)
-			log.Printf(massege)
-			return
-		}
-
-		idpub := cl.AddPublication(id, publication)
+		idpub := cl.AddPublication(publication)
 		w.Header().Add("Location", r.URL.String()+"/"+strconv.Itoa(idpub))
 		w.WriteHeader(http.StatusCreated)
 	}
@@ -111,15 +145,6 @@ func EditPublication(cl data.EditablePub) func(w http.ResponseWriter, r *http.Re
 			return
 		}
 
-		vars := mux.Vars(r)
-		id, err := strconv.Atoi(vars["id"])
-		if err != nil {
-			massege := fmt.Sprintf("Incorrect ID: %v", err)
-			http.Error(w, massege, http.StatusBadRequest)
-			log.Printf(massege)
-			return
-		}
-
 		varsp := mux.Vars(r)
 		idpub, err := strconv.Atoi(varsp["idpub"])
 		if err != nil {
@@ -129,7 +154,7 @@ func EditPublication(cl data.EditablePub) func(w http.ResponseWriter, r *http.Re
 			return
 		}
 
-		err = cl.EditPublication(id, publication, idpub)
+		err = cl.EditPublication(idpub, publication)
 		if err != nil {
 			massege := fmt.Sprintf("Incorrect ID publication: %v", err)
 			http.Error(w, massege, http.StatusBadRequest)
@@ -144,14 +169,6 @@ func EditPublication(cl data.EditablePub) func(w http.ResponseWriter, r *http.Re
 //DeletePublication обрабатывает DELETE запрос
 func DeletePublication(cl data.EditablePub) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, err := strconv.Atoi(vars["id"])
-		if err != nil {
-			massege := fmt.Sprintf("Incorrect ID: %v", err)
-			http.Error(w, massege, http.StatusBadRequest)
-			log.Printf(massege)
-			return
-		}
 
 		varsp := mux.Vars(r)
 		idpub, err := strconv.Atoi(varsp["idpub"])
@@ -162,7 +179,7 @@ func DeletePublication(cl data.EditablePub) func(w http.ResponseWriter, r *http.
 			return
 		}
 
-		err = cl.RemovePublication(id, idpub)
+		err = cl.RemovePublication(idpub)
 		if err != nil {
 			massege := fmt.Sprintf("Incorrect ID publication: %v", err)
 			http.Error(w, massege, http.StatusBadRequest)
@@ -175,154 +192,91 @@ func DeletePublication(cl data.EditablePub) func(w http.ResponseWriter, r *http.
 }
 
 //GetComments обрабатывает запросы на получения списка комментариев
-func GetComments(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
-	}
-
-	varsp := mux.Vars(r)
-	idpub, err := strconv.Atoi(varsp["idpub"])
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID publication: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
-	}
-
-	w.Header().Add("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(data.GetComments(id, idpub))
-	if err != nil {
-		massege := fmt.Sprintf("Unable to encode data: %v", err)
-		http.Error(w, massege, http.StatusInternalServerError)
-		log.Printf(massege)
-		return
+func GetComments(cl data.EditableComment) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		err := json.NewEncoder(w).Encode(cl.GetComments())
+		if err != nil {
+			massege := fmt.Sprintf("Unable to encode data: %v", err)
+			http.Error(w, massege, http.StatusInternalServerError)
+			log.Printf(massege)
+			return
+		}
 	}
 }
 
 //AddComment обрабатывает POST запрос
-func AddComment(w http.ResponseWriter, r *http.Request) {
-	var comment data.Comment
-	err := json.NewDecoder(r.Body).Decode(&comment)
-	if err != nil {
-		massege := fmt.Sprintf("Unable to decode POST data: %v", err)
-		http.Error(w, massege, http.StatusUnsupportedMediaType)
-		log.Printf(massege)
-		return
+func AddComment(cl data.EditableComment) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var comment data.Comment
+		err := json.NewDecoder(r.Body).Decode(&comment)
+		if err != nil {
+			massege := fmt.Sprintf("Unable to decode POST data: %v", err)
+			http.Error(w, massege, http.StatusUnsupportedMediaType)
+			log.Printf(massege)
+			return
+		}
+		idcom := cl.AddComment(comment)
+		w.Header().Add("Location", r.URL.String()+"/"+strconv.Itoa(idcom))
+		w.WriteHeader(http.StatusCreated)
 	}
-
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
-	}
-
-	varsp := mux.Vars(r)
-	idpub, err := strconv.Atoi(varsp["idpub"])
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID publication: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
-	}
-	idcom := data.AddComment(id, idpub, comment)
-	w.Header().Add("Location", r.URL.String()+"/"+strconv.Itoa(idcom))
-	w.WriteHeader(http.StatusCreated)
 }
 
 //EditComment обрабатыает PUT запрос
-func EditComment(w http.ResponseWriter, r *http.Request) {
-	var comment data.Comment
-	err := json.NewDecoder(r.Body).Decode(&comment)
-	if err != nil {
-		massege := fmt.Sprintf("Unable to decode PUT data: %v", err)
-		http.Error(w, massege, http.StatusUnsupportedMediaType)
-		log.Printf(massege)
-		return
-	}
+func EditComment(cl data.EditableComment) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var comment data.Comment
+		err := json.NewDecoder(r.Body).Decode(&comment)
+		if err != nil {
+			massege := fmt.Sprintf("Unable to decode PUT data: %v", err)
+			http.Error(w, massege, http.StatusUnsupportedMediaType)
+			log.Printf(massege)
+			return
+		}
 
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
-	}
+		varspc := mux.Vars(r)
+		idcom, err := strconv.Atoi(varspc["idcom"])
+		if err != nil {
+			massege := fmt.Sprintf("Incorrect ID commets: %v", err)
+			http.Error(w, massege, http.StatusBadRequest)
+			log.Printf(massege)
+			return
+		}
 
-	varsp := mux.Vars(r)
-	idpub, err := strconv.Atoi(varsp["idpub"])
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID publication: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
+		err = cl.EditComment(idcom, comment)
+		if err != nil {
+			massege := fmt.Sprintf("Incorrect ID comments: %v", err)
+			http.Error(w, massege, http.StatusBadRequest)
+			log.Printf(massege)
+			return
+		}
+		w.Header().Add("Location", r.URL.String())
+		w.WriteHeader(http.StatusAccepted)
 	}
-
-	varspc := mux.Vars(r)
-	idcom, err := strconv.Atoi(varspc["idcom"])
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID commets: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
-	}
-
-	err = data.EditComment(id, idpub, comment, idcom)
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID comments: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
-	}
-	w.Header().Add("Location", r.URL.String())
-	w.WriteHeader(http.StatusAccepted)
 }
 
 //DeleteComment обрабатывает DELETE запрос
-func DeleteComment(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
-	}
+func DeleteComment(cl data.EditableComment) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-	varsp := mux.Vars(r)
-	idpub, err := strconv.Atoi(varsp["idpub"])
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID publication: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
-	}
+		varspc := mux.Vars(r)
+		idcom, err := strconv.Atoi(varspc["idcom"])
+		if err != nil {
+			massege := fmt.Sprintf("Incorrect ID comments: %v", err)
+			http.Error(w, massege, http.StatusBadRequest)
+			log.Printf(massege)
+			return
+		}
 
-	varspc := mux.Vars(r)
-	idcom, err := strconv.Atoi(varspc["idcom"])
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID comments: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
+		err = cl.RemoveComment(idcom)
+		if err != nil {
+			massege := fmt.Sprintf("Incorrect ID comments: %v", err)
+			http.Error(w, massege, http.StatusBadRequest)
+			log.Printf(massege)
+			return
+		}
+		w.Header().Add("Location", r.URL.String())
+		w.WriteHeader(http.StatusNoContent)
 	}
-
-	err = data.RemoveComment(id, idpub, idcom)
-	if err != nil {
-		massege := fmt.Sprintf("Incorrect ID comments: %v", err)
-		http.Error(w, massege, http.StatusBadRequest)
-		log.Printf(massege)
-		return
-	}
-	w.Header().Add("Location", r.URL.String())
-	w.WriteHeader(http.StatusNoContent)
 }

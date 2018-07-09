@@ -17,13 +17,13 @@ type PublicationList struct {
 //EditablePub интерфейс для работы со списком публикаций
 type EditablePub interface {
 	GetPublications() []Publication
-	AddPublication(id int, publication Publication) int
-	EditPublication(id int, publication Publication, idpub int) error
-	RemovePublication(id int, idpub int) error
+	AddPublication(publication Publication) int
+	EditPublication(idpub int, publication Publication) error
+	RemovePublication(idpub int) error
 }
 
-//NewPublicationlist конструктор списка пудликаций
-func NewPublicationlist() *PublicationList {
+//NewPublicationList конструктор списка пудликаций
+func NewPublicationList() *PublicationList {
 	return &PublicationList{}
 }
 
@@ -36,31 +36,75 @@ type Profile struct {
 	Github  string `json:"github"`
 }
 
+//ProfileList структура для списка публикаций
+type ProfileList struct {
+	profiles []Profile
+}
+
+//EditableProfile интерфейс для работы со списком публикаций
+type EditableProfile interface {
+	GetProfiles() []Profile
+	AddProfile(profile Profile) int
+	EditProfile(id int, profile Profile) error
+	RemoveProfile(id int) error
+}
+
+//NewProfileList конструктор списка пудликаций
+func NewProfileList() *ProfileList {
+	return &ProfileList{}
+}
+
 //Comment структура для хранения комментария
 type Comment struct {
 	Time    string `json:"time"`
 	Comment string `json:"comment"`
 }
 
-//profiles хранимый список профилей
-var profiles []Profile
+//CommentList структура для списка публикаций
+type CommentList struct {
+	comments []Comment
+}
 
-//comments хранимый список комментариев
-var comments []Comment
+//EditableComment интерфейс для работы со списком публикаций
+type EditableComment interface {
+	GetComments() []Comment
+	AddComment(comment Comment) int
+	EditComment(idcom int, comment Comment) error
+	RemoveComment(idcom int) error
+}
+
+//NewCommentList конструктор списка пудликаций
+func NewCommentList() *CommentList {
+	return &CommentList{}
+}
+
+//GetProfiles возвращает список публикаций
+func (cl *ProfileList) GetProfiles() []Profile {
+	return cl.profiles
+}
 
 //AddProfile добавляет профиль в конец списка и возвращает id
-func AddProfile(profile Profile) int {
-	id := len(profiles)
-	profiles = append(profiles, profile)
+func (cl *ProfileList) AddProfile(profile Profile) int {
+	id := len(cl.profiles)
+	cl.profiles = append(cl.profiles, profile)
 	return id
 }
 
 //EditProfile изменяет публикацию с id на profile
-func EditProfile(profile Profile, id int) error {
-	if id < 0 || id >= len(profiles) {
+func (cl *ProfileList) EditProfile(id int, profile Profile) error {
+	if id < 0 || id >= len(cl.profiles) {
 		return fmt.Errorf("icorrect ID")
 	}
-	profiles[id] = profile
+	cl.profiles[id] = profile
+	return nil
+}
+
+//RemoveProfile удаляет публикацию по idpub
+func (cl *ProfileList) RemoveProfile(id int) error {
+	if id < 0 || id >= len(cl.profiles) {
+		return fmt.Errorf("icorrect ID")
+	}
+	cl.profiles = append(cl.profiles[:id], cl.profiles[id+1:]...)
 	return nil
 }
 
@@ -70,14 +114,14 @@ func (cl *PublicationList) GetPublications() []Publication {
 }
 
 //AddPublication добавляет публикацию в конец списка и возвращает idpub
-func (cl *PublicationList) AddPublication(id int, publication Publication) int {
+func (cl *PublicationList) AddPublication(publication Publication) int {
 	idpub := len(cl.publications)
 	cl.publications = append(cl.publications, publication)
 	return idpub
 }
 
 //EditPublication изменяет публикацию с id на publication
-func (cl *PublicationList) EditPublication(id int, publication Publication, idpub int) error {
+func (cl *PublicationList) EditPublication(idpub int, publication Publication) error {
 
 	if idpub < 0 || idpub >= len(cl.publications) {
 		return fmt.Errorf("icorrect ID publication")
@@ -87,7 +131,7 @@ func (cl *PublicationList) EditPublication(id int, publication Publication, idpu
 }
 
 //RemovePublication удаляет публикацию по idpub
-func (cl *PublicationList) RemovePublication(id int, idpub int) error {
+func (cl *PublicationList) RemovePublication(idpub int) error {
 
 	if idpub < 0 || idpub >= len(cl.publications) {
 		return fmt.Errorf("icorrect ID publication")
@@ -97,33 +141,33 @@ func (cl *PublicationList) RemovePublication(id int, idpub int) error {
 }
 
 //GetComments возвращает список комментариев
-func GetComments(id int, idpub int) []Comment {
-	return comments
+func (cl *CommentList) GetComments() []Comment {
+	return cl.comments
 }
 
 //AddComment добавляет публикацию в конец списка и возвращает id
-func AddComment(id int, idpub int, comment Comment) int {
-	idcom := len(comments)
-	comments = append(comments, comment)
+func (cl *CommentList) AddComment(comment Comment) int {
+	idcom := len(cl.comments)
+	cl.comments = append(cl.comments, comment)
 	return idcom
 }
 
 //EditComment изменяет публикацию с id на comment
-func EditComment(id int, idpub int, comment Comment, idcom int) error {
+func (cl *CommentList) EditComment(idcom int, comment Comment) error {
 
-	if idcom < 0 || idcom >= len(comments) {
+	if idcom < 0 || idcom >= len(cl.comments) {
 		return fmt.Errorf("icorrect ID comment")
 	}
-	comments[idcom] = comment
+	cl.comments[idcom] = comment
 	return nil
 }
 
 //RemoveComment удаляет публикацию по id
-func RemoveComment(id int, idpub int, idcom int) error {
+func (cl *CommentList) RemoveComment(idcom int) error {
 
-	if idcom < 0 || idcom >= len(comments) {
+	if idcom < 0 || idcom >= len(cl.comments) {
 		return fmt.Errorf("icorrect ID comment")
 	}
-	comments = append(comments[:idcom], comments[idcom+1:]...)
+	cl.comments = append(cl.comments[:idcom], cl.comments[idcom+1:]...)
 	return nil
 }
