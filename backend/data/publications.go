@@ -109,10 +109,7 @@ func AddComment(id int, idpub int, comment Comment) int {
 }
 
 //EditComment изменяет публикацию с id на comment
-func (cl *PublicationList) EditComment(id int, idpub int, comment Comment, idcom int) error {
-	if idpub < 0 || idpub >= len(cl.publications) {
-		return fmt.Errorf("icorrect ID publication")
-	}
+func EditComment(id int, idpub int, comment Comment, idcom int) error {
 
 	if idcom < 0 || idcom >= len(comments) {
 		return fmt.Errorf("icorrect ID comment")
@@ -122,10 +119,7 @@ func (cl *PublicationList) EditComment(id int, idpub int, comment Comment, idcom
 }
 
 //RemoveComment удаляет публикацию по id
-func (cl *PublicationList) RemoveComment(id int, idpub int, idcom int) error {
-	if idpub < 0 || idpub >= len(cl.publications) {
-		return fmt.Errorf("icorrect ID publication")
-	}
+func RemoveComment(id int, idpub int, idcom int) error {
 
 	if idcom < 0 || idcom >= len(comments) {
 		return fmt.Errorf("icorrect ID comment")
