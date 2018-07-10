@@ -56,7 +56,7 @@ export default {
           'name': 'Имя',
           'surname': 'Фамилия',
           'email': 'user@domain.ru',
-          'github': 'user'
+          'github': 'userr'
         }
       ],
       new_blog:
