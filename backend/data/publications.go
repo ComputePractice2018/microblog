@@ -22,12 +22,12 @@ type EditablePub interface {
 	RemovePublication(idpub int) error
 }
 
-//NewPublicationList конструктор списка пудликаций
+//NewPublicationList конструктор списка публикаций
 func NewPublicationList() *PublicationList {
 	return &PublicationList{}
 }
 
-//Profile структура для храниения профиля пользователя
+//Profile структура для храниения профиля
 type Profile struct {
 	Nikname string `json:"nikname"`
 	Name    string `json:"name"`
@@ -36,12 +36,12 @@ type Profile struct {
 	Github  string `json:"github"`
 }
 
-//ProfileList структура для списка публикаций
+//ProfileList структура для списка профилей
 type ProfileList struct {
 	profiles []Profile
 }
 
-//EditableProfile интерфейс для работы со списком публикаций
+//EditableProfile интерфейс для работы со списком профиля
 type EditableProfile interface {
 	GetProfiles() []Profile
 	AddProfile(profile Profile) int
@@ -49,7 +49,7 @@ type EditableProfile interface {
 	RemoveProfile(id int) error
 }
 
-//NewProfileList конструктор списка пудликаций
+//NewProfileList конструктор списка профиля
 func NewProfileList() *ProfileList {
 	return &ProfileList{}
 }
@@ -60,12 +60,12 @@ type Comment struct {
 	Comment string `json:"comment"`
 }
 
-//CommentList структура для списка публикаций
+//CommentList структура для списка комментариев
 type CommentList struct {
 	comments []Comment
 }
 
-//EditableComment интерфейс для работы со списком публикаций
+//EditableComment интерфейс для работы со списком комментариев
 type EditableComment interface {
 	GetComments() []Comment
 	AddComment(comment Comment) int
@@ -73,12 +73,12 @@ type EditableComment interface {
 	RemoveComment(idcom int) error
 }
 
-//NewCommentList конструктор списка пудликаций
+//NewCommentList конструктор списка комментариев
 func NewCommentList() *CommentList {
 	return &CommentList{}
 }
 
-//GetProfiles возвращает список публикаций
+//GetProfiles возвращает список профилей
 func (cl *ProfileList) GetProfiles() []Profile {
 	return cl.profiles
 }
@@ -90,7 +90,7 @@ func (cl *ProfileList) AddProfile(profile Profile) int {
 	return id
 }
 
-//EditProfile изменяет публикацию с id на profile
+//EditProfile изменяет профиль с id на profile
 func (cl *ProfileList) EditProfile(id int, profile Profile) error {
 	if id < 0 || id >= len(cl.profiles) {
 		return fmt.Errorf("icorrect ID")
@@ -99,7 +99,7 @@ func (cl *ProfileList) EditProfile(id int, profile Profile) error {
 	return nil
 }
 
-//RemoveProfile удаляет публикацию по idpub
+//RemoveProfile удаляет профиль по idpub
 func (cl *ProfileList) RemoveProfile(id int) error {
 	if id < 0 || id >= len(cl.profiles) {
 		return fmt.Errorf("icorrect ID")
@@ -145,14 +145,14 @@ func (cl *CommentList) GetComments() []Comment {
 	return cl.comments
 }
 
-//AddComment добавляет публикацию в конец списка и возвращает id
+//AddComment добавляет комментарий в конец списка и возвращает id
 func (cl *CommentList) AddComment(comment Comment) int {
 	idcom := len(cl.comments)
 	cl.comments = append(cl.comments, comment)
 	return idcom
 }
 
-//EditComment изменяет публикацию с id на comment
+//EditComment изменяет комментарий с id на comment
 func (cl *CommentList) EditComment(idcom int, comment Comment) error {
 
 	if idcom < 0 || idcom >= len(cl.comments) {
@@ -162,7 +162,7 @@ func (cl *CommentList) EditComment(idcom int, comment Comment) error {
 	return nil
 }
 
-//RemoveComment удаляет публикацию по id
+//RemoveComment удаляет комментарий по id
 func (cl *CommentList) RemoveComment(idcom int) error {
 
 	if idcom < 0 || idcom >= len(cl.comments) {
