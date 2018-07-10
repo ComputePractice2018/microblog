@@ -77,7 +77,7 @@ func EditProfile(cl data.EditableProfile) func(w http.ResponseWriter, r *http.Re
 }
 
 //DeleteProfiles обрабатывает DELETE запрос
-func DeleteProfiles(cl data.EditableProfile) func(w http.ResponseWriter, r *http.Request) {
+func DeleteProfile(cl data.EditableProfile) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		id, err := strconv.Atoi(vars["id"])

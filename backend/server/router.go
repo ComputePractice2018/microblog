@@ -8,8 +8,11 @@ import (
 //NewRouter
 func NewRouter(publicationList data.EditablePub, profileList data.EditableProfile, commentList data.EditableComment) *mux.Router {
 	router := mux.NewRouter()
+
+	router.HandleFunc("/api/microblog/profiles", GetProfiles(profileList)).Methods("GET")
 	router.HandleFunc("/api/microblog/profiles", AddProfile(profileList)).Methods("POST")
 	router.HandleFunc("/api/microblog/profiles/{id}", EditProfile(profileList)).Methods("PUT")
+	router.HandleFunc("/api/microblog/profiles/{id}", DeleteProfile(profileList)).Methods("DELETE")
 
 	router.HandleFunc("/api/microblog/profiles/{id}/publications", GetPublications(publicationList)).Methods("GET")
 	router.HandleFunc("/api/microblog/profiles/{id}/publications", AddPublication(publicationList)).Methods("POST")
