@@ -51,7 +51,7 @@ func TestProfileServerPOST(t *testing.T) {
 		t.Errorf("Expected 201 code (gotten:%d)", resp.StatusCode)
 	}
 
-	if resp.Header.Get("Location") != "/api/microblog/profiles/0" {
+	if resp.Header.Get("Location") != "/api/microblog/profiles/1" {
 		t.Error("Expected another Location")
 	}
 
@@ -63,7 +63,7 @@ func TestProfileServerPOST(t *testing.T) {
 func TestProfileServerPUT(t *testing.T) {
 	router := NewRouter(cpub, cpro, ccom)
 	testData := strings.NewReader(testProfiles)
-	req, _ := http.NewRequest("PUT", "/api/microblog/profiles/0", testData)
+	req, _ := http.NewRequest("PUT", "/api/microblog/profiles/1", testData)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -73,7 +73,7 @@ func TestProfileServerPUT(t *testing.T) {
 		t.Errorf("Expected 201 code (gotten:%d)", resp.StatusCode)
 	}
 
-	if resp.Header.Get("Location") != "/api/microblog/profiles/0" {
+	if resp.Header.Get("Location") != "/api/microblog/profiles/1" {
 		t.Error("Expected another Location")
 	}
 
@@ -84,7 +84,7 @@ func TestProfileServerPUT(t *testing.T) {
 
 func TestProfileServerDELETE(t *testing.T) {
 	router := NewRouter(cpub, cpro, ccom)
-	req, _ := http.NewRequest("DELETE", "/api/microblog/profiles/0", nil)
+	req, _ := http.NewRequest("DELETE", "/api/microblog/profiles/1", nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -103,7 +103,7 @@ func TestPublicationServerGET(t *testing.T) {
 
 	router := NewRouter(cpub, cpro, ccom)
 
-	req, err := http.NewRequest("GET", "/api/microblog/profiles/0/publications", nil)
+	req, err := http.NewRequest("GET", "/api/microblog/profiles/1/publications", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -124,7 +124,7 @@ func TestPublicationServerGET(t *testing.T) {
 func TestPublicationServerPOST(t *testing.T) {
 	router := NewRouter(cpub, cpro, ccom)
 	testData := strings.NewReader(testPublications)
-	req, _ := http.NewRequest("POST", "/api/microblog/profiles/0/publications", testData)
+	req, _ := http.NewRequest("POST", "/api/microblog/profiles/1/publications", testData)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -134,7 +134,7 @@ func TestPublicationServerPOST(t *testing.T) {
 		t.Errorf("Expected 201 code (gotten:%d)", resp.StatusCode)
 	}
 
-	if resp.Header.Get("Location") != "/api/microblog/profiles/0/publications/0" {
+	if resp.Header.Get("Location") != "/api/microblog/profiles/1/publications/1" {
 		t.Error("Expected another Location")
 	}
 
@@ -146,7 +146,7 @@ func TestPublicationServerPOST(t *testing.T) {
 func TestPublicationServerPUT(t *testing.T) {
 	router := NewRouter(cpub, cpro, ccom)
 	testData := strings.NewReader(testPublications)
-	req, _ := http.NewRequest("PUT", "/api/microblog/profiles/0/publications/0", testData)
+	req, _ := http.NewRequest("PUT", "/api/microblog/profiles/1/publications/1", testData)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -156,7 +156,7 @@ func TestPublicationServerPUT(t *testing.T) {
 		t.Errorf("Expected 201 code (gotten:%d)", resp.StatusCode)
 	}
 
-	if resp.Header.Get("Location") != "/api/microblog/profiles/0/publications/0" {
+	if resp.Header.Get("Location") != "/api/microblog/profiles/1/publications/1" {
 		t.Error("Expected another Location")
 	}
 
@@ -167,7 +167,7 @@ func TestPublicationServerPUT(t *testing.T) {
 
 func TestPublicationServerDELETE(t *testing.T) {
 	router := NewRouter(cpub, cpro, ccom)
-	req, _ := http.NewRequest("DELETE", "/api/microblog/profiles/0/publications/0", nil)
+	req, _ := http.NewRequest("DELETE", "/api/microblog/profiles/1/publications/1", nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -186,7 +186,7 @@ func TestCommentServerGET(t *testing.T) {
 
 	router := NewRouter(cpub, cpro, ccom)
 
-	req, err := http.NewRequest("GET", "/api/microblog/profiles/0/publications/0/comments", nil)
+	req, err := http.NewRequest("GET", "/api/microblog/profiles/1/publications/1/comments", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -207,7 +207,7 @@ func TestCommentServerGET(t *testing.T) {
 func TestCommentServerPOST(t *testing.T) {
 	router := NewRouter(cpub, cpro, ccom)
 	testData := strings.NewReader(testComments)
-	req, _ := http.NewRequest("POST", "/api/microblog/profiles/0/publications/0/comments", testData)
+	req, _ := http.NewRequest("POST", "/api/microblog/profiles/1/publications/1/comments", testData)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -217,7 +217,7 @@ func TestCommentServerPOST(t *testing.T) {
 		t.Errorf("Expected 201 code (gotten:%d)", resp.StatusCode)
 	}
 
-	if resp.Header.Get("Location") != "/api/microblog/profiles/0/publications/0/comments/0" {
+	if resp.Header.Get("Location") != "/api/microblog/profiles/1/publications/1/comments/1" {
 		t.Error("Expected another Location")
 	}
 
@@ -229,7 +229,7 @@ func TestCommentServerPOST(t *testing.T) {
 func TestCommentServerPUT(t *testing.T) {
 	router := NewRouter(cpub, cpro, ccom)
 	testData := strings.NewReader(testComments)
-	req, _ := http.NewRequest("PUT", "/api/microblog/profiles/0/publications/0/comments/0", testData)
+	req, _ := http.NewRequest("PUT", "/api/microblog/profiles/1/publications/1/comments/1", testData)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -239,7 +239,7 @@ func TestCommentServerPUT(t *testing.T) {
 		t.Errorf("Expected 201 code (gotten:%d)", resp.StatusCode)
 	}
 
-	if resp.Header.Get("Location") != "/api/microblog/profiles/0/publications/0/comments/0" {
+	if resp.Header.Get("Location") != "/api/microblog/profiles/1/publications/1/comments/1" {
 		t.Error("Expected another Location")
 	}
 
@@ -250,7 +250,7 @@ func TestCommentServerPUT(t *testing.T) {
 
 func TestCommentServerDELETE(t *testing.T) {
 	router := NewRouter(cpub, cpro, ccom)
-	req, _ := http.NewRequest("DELETE", "/api/microblog/profiles/0/publications/0/comments/0", nil)
+	req, _ := http.NewRequest("DELETE", "/api/microblog/profiles/1/publications/1/comments/1", nil)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
