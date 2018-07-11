@@ -4,6 +4,7 @@ import "fmt"
 
 //Publication структура для хранения публикации
 type Publication struct {
+	IDpub      int    `json:"idpub"`
 	Namepub    string `json:"namepub"`
 	Time       string `json:"time"`
 	Publcation string `json:"publication"`
@@ -29,6 +30,7 @@ func NewPublicationList() *PublicationList {
 
 //Profile структура для храниения профиля
 type Profile struct {
+	ID      int    `json:"id"`
 	Nikname string `json:"nikname"`
 	Name    string `json:"name"`
 	Surname string `json:"surname"`
@@ -56,6 +58,7 @@ func NewProfileList() *ProfileList {
 
 //Comment структура для хранения комментария
 type Comment struct {
+	IDcom   int    `json:"idcom"`
 	Time    string `json:"time"`
 	Comment string `json:"comment"`
 }
@@ -85,25 +88,27 @@ func (cl *ProfileList) GetProfiles() []Profile {
 
 //AddProfile добавляет профиль в конец списка и возвращает id
 func (cl *ProfileList) AddProfile(profile Profile) int {
-	id := len(cl.profiles)
+	id := len(cl.profiles) + 1
+	profile.ID = id
 	cl.profiles = append(cl.profiles, profile)
 	return id
 }
 
 //EditProfile изменяет профиль с id на profile
 func (cl *ProfileList) EditProfile(id int, profile Profile) error {
-	if id < 0 || id >= len(cl.profiles) {
+	if id < 1 || id > len(cl.profiles) {
 		return fmt.Errorf("icorrect ID")
 	}
-	cl.profiles[id] = profile
+	cl.profiles[id-1] = profile
 	return nil
 }
 
 //RemoveProfile удаляет профиль по idpub
 func (cl *ProfileList) RemoveProfile(id int) error {
-	if id < 0 || id >= len(cl.profiles) {
+	if id < 1 || id > len(cl.profiles) {
 		return fmt.Errorf("icorrect ID")
 	}
+	id--
 	cl.profiles = append(cl.profiles[:id], cl.profiles[id+1:]...)
 	return nil
 }
@@ -115,7 +120,8 @@ func (cl *PublicationList) GetPublications() []Publication {
 
 //AddPublication добавляет публикацию в конец списка и возвращает idpub
 func (cl *PublicationList) AddPublication(publication Publication) int {
-	idpub := len(cl.publications)
+	idpub := len(cl.publications) + 1
+	publication.IDpub = idpub
 	cl.publications = append(cl.publications, publication)
 	return idpub
 }
@@ -123,19 +129,20 @@ func (cl *PublicationList) AddPublication(publication Publication) int {
 //EditPublication изменяет публикацию с id на publication
 func (cl *PublicationList) EditPublication(idpub int, publication Publication) error {
 
-	if idpub < 0 || idpub >= len(cl.publications) {
+	if idpub < 1 || idpub > len(cl.publications) {
 		return fmt.Errorf("icorrect ID publication")
 	}
-	cl.publications[idpub] = publication
+	cl.publications[idpub-1] = publication
 	return nil
 }
 
 //RemovePublication удаляет публикацию по idpub
 func (cl *PublicationList) RemovePublication(idpub int) error {
 
-	if idpub < 0 || idpub >= len(cl.publications) {
+	if idpub < 1 || idpub > len(cl.publications) {
 		return fmt.Errorf("icorrect ID publication")
 	}
+	idpub--
 	cl.publications = append(cl.publications[:idpub], cl.publications[idpub+1:]...)
 	return nil
 }
@@ -147,7 +154,8 @@ func (cl *CommentList) GetComments() []Comment {
 
 //AddComment добавляет комментарий в конец списка и возвращает id
 func (cl *CommentList) AddComment(comment Comment) int {
-	idcom := len(cl.comments)
+	idcom := len(cl.comments) + 1
+	comment.IDcom = idcom
 	cl.comments = append(cl.comments, comment)
 	return idcom
 }
@@ -155,19 +163,20 @@ func (cl *CommentList) AddComment(comment Comment) int {
 //EditComment изменяет комментарий с id на comment
 func (cl *CommentList) EditComment(idcom int, comment Comment) error {
 
-	if idcom < 0 || idcom >= len(cl.comments) {
+	if idcom < 1 || idcom > len(cl.comments) {
 		return fmt.Errorf("icorrect ID comment")
 	}
-	cl.comments[idcom] = comment
+	cl.comments[idcom-1] = comment
 	return nil
 }
 
 //RemoveComment удаляет комментарий по id
 func (cl *CommentList) RemoveComment(idcom int) error {
 
-	if idcom < 0 || idcom >= len(cl.comments) {
+	if idcom < 1 || idcom > len(cl.comments) {
 		return fmt.Errorf("icorrect ID comment")
 	}
+	idcom--
 	cl.comments = append(cl.comments[:idcom], cl.comments[idcom+1:]...)
 	return nil
 }
