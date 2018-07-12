@@ -2,6 +2,8 @@
   <div class="microblog">
     <h1>{{ title }}</h1>
 
+    <h3 v-if="error">ОШИБКА: {{error}}</h3>
+
     <table>
      <tr>
         <th>Ник</th>
@@ -29,12 +31,13 @@
       <p>E-mail:<input type="text" v-model="new_blog.email"></p>
       <p>GitHub:<input type="text" v-model="new_blog.github"></p>
       <button v-if = "edit_index == -1" v-on:click="add_new_blog">Добавить блог</button>
-      <button v-if = "edit_index > -1" v-on:click="make_new_blog">Закончить редактирование</button>
+      <button v-if = "edit_index > -1" v-on:click="end_of_edition">Закончить редактирование</button>
     </form>
   </div>
 </template>
 
 <script>
+const axios = require('axios')
 export default {
   name: 'microblog',
   props: {
@@ -43,22 +46,8 @@ export default {
   data: function () {
     return {
       edit_index: -1,
-      blog_list: [
-        {
-          'nikname': 'hrilev',
-          'name': 'Максим',
-          'surname': 'Хрылев',
-          'email': 'hrilev@dyandex.ru',
-          'github': 'hrilev'
-        },
-        {
-          'nikname': 'Ник',
-          'name': 'Имя',
-          'surname': 'Фамилия',
-          'email': 'user@domain.ru',
-          'github': 'userr'
-        }
-      ],
+      error: '',
+      blog_list: [],
       new_blog:
         {
           'nikname': '',
@@ -69,26 +58,55 @@ export default {
         }
     }
   },
+  mouned: function () {
+    this.get_blog()
+  },
   methods: {
+    get_blog: function () {
+      this.error = ''
+      const url = '/api/microblog/profiles'
+      axios.get(url).then(response => {
+        this.blog_list = response.data
+      }).catch(response => {
+        this.error = response.response.data
+      })
+    },
     add_new_blog: function () {
-      this.blog_list.push(this.new_blog)
+      const url = '/api/microblog/profiles'
+      axios.post(url, this.new_blog).then(response => {
+        console.log(response)
+        this.blog_list.push(this.new_blog)
+      }).catch(response => {
+        this.error = response.response.data
+      })
     },
     remove_blog: function (item) {
-      this.blog_list.splice(this.blog_list.indexOf(item), 1)
+      const url = '/api/microblog/profiles/' + this.blog_list.indexOf(item)
+      axios.delete(url).then(response => {
+        this.blog_list.splice(this.blog_list.indexOf(item), 1)
+      }).catch(response => {
+        this.error = response.response.data
+      })
     },
     edit_blog: function (item) {
       this.edit_index = this.blog_list.indexOf(item)
       this.new_blog = this.blog_list[this.edit_index]
     },
-    make_new_blog: function () {
-      this.edit_index = -1
-      this.new_blog = {
-        'nikname': '',
-        'name': '',
-        'surname': '',
-        'email': '',
-        'github': ''
-      }
+    end_of_edition: function () {
+      this.error = ''
+      const url = '/api/microblog/profiles/' + this.edit_index
+      axios.put(url, this.new_blog).then(response => {
+        this.edit_index = -1
+        this.new_blog = {
+          'nikname': '',
+          'name': '',
+          'surname': '',
+          'email': '',
+          'github': ''
+        }
+      }).catch(response => {
+        this.error = response.response.data
+      })
     }
   }
 }
