@@ -93,9 +93,12 @@ export default {
       this.new_blog = this.blog_list[this.edit_index]
     },
     end_of_edition: function () {
+
       this.error = ''
       const url = '/api/microblog/profiles/' + this.edit_index
       axios.put(url, this.new_blog).then(response => {
+        console.log(response)
+
         this.edit_index = -1
         this.new_blog = {
           'nikname': '',
