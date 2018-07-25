@@ -137,3 +137,13 @@ Location: /api/microblog/profile/1/publications/1
 ### DELETE /api/microblog/profiles/1/publications/1
 
 Ответ: 204 No Content
+
+## как собрать и запустить 
+
+Backend:
+
+'''bat
+cd backend
+docker build -f Dockerfile-t microblog:<имя ветки> .
+docker run --rm --name microblog -e NAME=<параметр приложения> microblog:<имя ветки>
+'''
