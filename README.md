@@ -140,10 +140,18 @@ Location: /api/microblog/profile/1/publications/1
 
 ## как собрать и запустить 
 
-Backend: 
+Backend:
 
-'''bat 
-cd backend 
-docker build -f Dockerfile-t microblog:<имя ветки> . 
-docker run —rm —name microblog -e NAME=<параметр приложения> microblog:<имя ветки> 
+'''bat
+cd backend
+docker build -f Dockerfile -t microblogbackend:<имя ветки> .
+docker run --rm --name microblogbackend -e NAME=<параметр приложения> microblogbackend:<имя ветки>
+'''
+
+Frontend:
+
+'''bat
+cd frontend
+docker build -f Dockerfile -t microblogfrontend:<имя ветки> .
+docker run -d --rm --name microblogfrontend -p 80:80 microblogfrontend:<имя ветки>
 '''
