@@ -1,11 +1,14 @@
 FROM golang:alpine as builder
 
-ENV SRC=/go/src/github.com/ComputePractice2018/microblog/backend
+ENV SRC=/go/src/github.com/ComputePractice2018/microblog/backend/
 RUN mkdir -p '${SRC}'
 ADD . ${SRC}
 
 RUN apk add --no-cache git
-RUN ls ${SRC} 
+RUN go get -u github.com/jinzhu/gorm 
+RUN go get -u github.com/go-sql-driver/mysql
+RUN go get -u github.com/gorilla/mux
+
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/microblog github.com/ComputePractice2018/microblog/backend 
  
 
