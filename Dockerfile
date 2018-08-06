@@ -1,3 +1,3 @@
 FROM nginx:alpine
 
-ADD nginx.conf /etc/nginx/conf.d/proxy.conf
+ADD nginx.conf /etc/nginx/nginx.conf
